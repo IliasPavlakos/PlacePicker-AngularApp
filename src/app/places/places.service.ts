@@ -47,6 +47,21 @@ export class PlacesService {
   }
 
   removeUserPlace(place: Place) {
+    const prevPlaces = this.userPlaces();
+
+    if(prevPlaces.some(p => p.id === place.id)) {
+      this.userPlaces.set(prevPlaces.filter(p => p.id !== place.id));
+    }
+
+    // If http request fails the user has a wrong view
+    // Can add same place twice
+    return this.httpClient
+      .delete(`http://localhost:3000/user-places/` + place.id)
+      .pipe(catchError(() => {
+        this.userPlaces.set(prevPlaces);
+        this.errorService.showError('Failed to remove selected favorite place.')
+        return throwError(() => new Error('Failed to remove selected favorite place.'));
+      }))
   }
 
   private FetchPlaces(url: string, errorMessage: string) {
