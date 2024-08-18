@@ -2,12 +2,20 @@ import { Component } from '@angular/core';
 
 import { AvailablePlacesComponent } from './places/available-places/available-places.component';
 import { UserPlacesComponent } from './places/user-places/user-places.component';
+import {ErrorService} from "./shared/error.service";
+import {ErrorModalComponent} from "./shared/modal/error-modal/error-modal.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
-  imports: [AvailablePlacesComponent, UserPlacesComponent],
+  imports: [AvailablePlacesComponent, UserPlacesComponent, ErrorModalComponent],
 })
-export class AppComponent {}
+export class AppComponent {
+
+  constructor(private errorService: ErrorService) {}
+
+  error = this.errorService.error;
+
+}
