@@ -29,6 +29,8 @@ export class PlacesService {
 
   addPlaceToUserPlaces(place: Place) {
     this.userPlaces.update(places => [...places, place]);
+    // If http request fails the user has a wrong view
+    // Can add same place twice
     return this.httpClient.put(`http://localhost:3000/user-places/`, { placeId: place.id });
   }
 
