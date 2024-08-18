@@ -14,6 +14,7 @@ export class PlacesService {
 
   private userPlaces = signal<Place[]>([]);
 
+
   loadedUserPlaces = this.userPlaces.asReadonly();
 
   loadAvailablePlaces() {
@@ -28,10 +29,20 @@ export class PlacesService {
   }
 
   addPlaceToUserPlaces(place: Place) {
-    this.userPlaces.update(places => [...places, place]);
+    const prevPlaces = this.userPlaces();
+
+    if(!prevPlaces.some(p => p.id === place.id)) {
+      this.userPlaces.update(places => [...places, place]);
+    }
+
     // If http request fails the user has a wrong view
     // Can add same place twice
-    return this.httpClient.put(`http://localhost:3000/user-places/`, { placeId: place.id });
+    return this.httpClient
+      .put(`http://localhost:3000/user-places/`, { placeId: place.id })
+      .pipe(catchError(() => {
+        this.userPlaces.set(prevPlaces);
+        return throwError(() => new Error('Failed to store selected place.'));
+      }))
   }
 
   removeUserPlace(place: Place) {
